@@ -7,7 +7,8 @@ To use the camera trap at home it is important to understand the libraries and c
 Without modifying the code, the binaries are ready to upload to the STM and ESP and available through the binaries directory. To connect the boards and components please see the pinout diagram below.
 
 ### PINOUT DIAGRAM
-![image](https://github.com/user-attachments/assets/6e901b13-24dc-4c2e-bc6d-1d5d26c495cb)
+![image](https://github.com/user-attachments/assets/4964d674-5fae-407a-836c-4ff30c359657)
+
 
 
 
