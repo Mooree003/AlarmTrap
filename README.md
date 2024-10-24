@@ -6,7 +6,9 @@ This alarm trap is a portable and efficient camera trap with an integrated web-i
 To use the camera trap at home it is important to understand the libraries and code used.
 Without modifying the code, the binaries are ready to upload to the STM and ESP and available through the binaries directory. To connect the boards and components please see the pinout diagram below.
 
-PINOUT DIAGRAM
+### PINOUT DIAGRAM
+![image](https://github.com/user-attachments/assets/6e901b13-24dc-4c2e-bc6d-1d5d26c495cb)
+
 
 
 ## Accessing the Web Interface
