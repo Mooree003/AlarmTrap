@@ -4,7 +4,8 @@
 For this camera trap we have used a STM32F446RE, so relevant pin maps and binaries are made specifically for this model. However, we have provided the source code in the .ino file so if you have a different board you can make some small changes and upload it to your own device.
 
 ## Pin Map
-image here
+![image](https://github.com/user-attachments/assets/87e8fbb5-b581-4a65-9958-5f73e95a9627)
+
 
 The pin map shown above describes the pins we use to build our alarm system. The PIR Sensor is powered with the 5V power source, whereas we power the VL53L1X with 3V3 power source.
 
