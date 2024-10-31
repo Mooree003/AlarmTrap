@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Activation Logs</title>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2"></script>
+    <link rel="stylesheet" href="/stylesheets/logs.css">
+</head>
+<body>
+    <button id="return" onclick="location.href='/home'">Return</button>
+    <h1>Activation Logs</h1>
+    <div class="center-button-container">
+        <button id="clear" onclick="clearLogs()">Clear All Logs</button>
+    </div>
+    <div id="app">
+        <div id="log" v-for="log in logs" :key="log.id">
+            <h3>ID: {{ log.id }}</h3>
+            <h3>Timestamp: {{ log.timestamp }}</h3>
+            <img :src="log.image" alt="Captured image" />
+        </div>
+    </div>
+
+    <script>
+        function clearLogs() {
+            app.clearLogs();
+        }
+
+        const app = new Vue({
+            el: '#app',
+            data: {
+                logs: []
+            },
+            created() {
+                this.fetchLogs();
+                this.startPolling();
+            },
+            methods: {
+                fetchLogs() {
+                    fetch('/api/logs')
+                        .then(response => response.json())
+                        .then(data => {
+                            this.logs = data;
+                        })
+                        .catch(error => {
+                            console.error('Error fetching logs:', error);
+                        });
+                },
+                clearLogs() {
+                    fetch('/api/clear-logs', {
+                        method: 'DELETE'
+                    })
+                    .then(response => {
+                        if (response.ok) {
+                            console.log('Logs cleared successfully');
+                            this.fetchLogs(); // Refresh the logs
+                        } else {
+                            console.error('Failed to clear logs. Status:', response.status);
+                            return response.json().then(error => console.error('Error details:', error));
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error clearing logs:', error);
+                    });
+                },
+                startPolling() {
+                    this.pollInterval = setInterval(() => {
+                        this.fetchLogs();
+                    }, 5000);
+                }
+            },
+            beforeDestroy() {
+                if (this.pollInterval) {
+                    clearInterval(this.pollInterval);
+                }
+            }
+        });
+    </script>
+</body>
+</html>

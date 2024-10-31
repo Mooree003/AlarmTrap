@@ -1,0 +1,27 @@
+CREATE DATABASE IF NOT EXISTS myapp;
+
+
+USE myapp;
+
+
+CREATE TABLE IF NOT EXISTS users (
+    email VARCHAR(255) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS logs (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    image LONGBLOB NOT NULL,
+    timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS codes (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    activation_code CHAR(4) NOT NULL
+);
+INSERT INTO codes (activation_code) VALUES ('0000');
+
+CREATE TABLE IF NOT EXISTS alarm_state (
+    state INT DEFAULT 0
+);
+INSERT INTO alarm_state (state) VALUES (0) ON DUPLICATE KEY UPDATE state=state;

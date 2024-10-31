@@ -1,0 +1,54 @@
+body {
+    background-color: #DEF0FF;
+    text-align: center;
+}
+
+h1 {
+    padding-top: 3em;
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+}
+
+h3 {
+    font-family: Arial, Helvetica, sans-serif;
+    font-weight: bold;
+}
+
+div {
+    width: 15em;
+    padding-left: 1em;
+    padding-right: 1em;
+    padding-bottom: 1.5em;
+    padding-top: 0.25em;
+    background-color: white;
+    border-radius: 2em;
+    text-align: center;
+    margin: 1em auto;                                 /* Center horizontally with auto margins */
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);      /* Shadow effect */
+}
+
+input {
+    width: 15em;
+    border: 0em;
+    border-radius: 0.5em;
+    background-color: #EEEEEE;
+    height: 2em;
+}
+
+button {
+    margin-top: 1em;
+    color: white;
+    font-weight: bold;
+    background-color: #6A87FF;
+    border: 0em;
+    border-radius: 0.5em;
+    padding: 1em;
+    width: 11em;
+    text-align: center;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);        /* Shadow effect */
+    transition: box-shadow 0.3s;                        /* Smooth transition for hover effect */
+}
+
+button:hover {
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);        /* Darker shadow on hover */
+}

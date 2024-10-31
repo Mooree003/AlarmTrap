@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="stylesheet" href="/stylesheets/home.css">
+    <script>
+        // Function to change the password (no changes needed here)
+        function changePassword() {
+            const currentPassword = prompt("Enter current password:");
+            if (!currentPassword) {
+                alert("Current password is required.");
+                return;
+            }
+            const newPassword = prompt("Enter new password:");
+            if (!newPassword) {
+                alert("New password is required.");
+                return;
+            }
+
+            fetch('/change-password', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ currentPassword, newPassword })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Password changed successfully!");
+                } else {
+                    alert("Password change failed: " + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("An error occurred.");
+            });
+        }
+
+        // Function to set activation code (no changes needed here)
+        function setActivationCode() {
+            const newCode = prompt("Enter new activation code (4 digits between 0000 and 9999)");
+            if (!newCode || !/^\d{4}$/.test(newCode)) {
+                alert("Invalid code! Please enter a 4-digit code between 0000 and 9999.");
+                return;
+            }
+            fetch('/set-activation-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: newCode })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert("Activation code updated successfully!");
+                } else {
+                    if (data.message === "This activation code already exists. Please choose a different code.") {
+                        alert("Error: The activation code already exists. Please choose a different code.");
+                    } else {
+                        alert("Failed to update activation code: " + data.message);
+                    }
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("An error occurred while updating the activation code.");
+            });
+        }
+
+        // Function to verify the activation code
+        function verifyActivationCode(action) {
+            const activationCode = prompt("Enter the activation code:");
+            if (!activationCode) {
+                alert("Activation code is required.");
+                return;
+            }
+
+            return fetch('/verify-activation-code', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ code: activationCode, action: action })
+            })
+            .then(response => response.json());
+        }
+
+        // Function to activate or deactivate the alarm
+        function deactivateAlarm() {
+            const deactivateButton = document.getElementById('deactivate');
+            const action = deactivateButton.innerText === 'Activate Alarm' ? 'activate' : 'deactivate';
+
+            verifyActivationCode(action)
+                .then(data => {
+                    if (data.success) {
+                        if (action === 'activate') {
+                            deactivateButton.innerText = 'Deactivate Alarm';
+                            deactivateButton.classList.remove('activate');
+                            deactivateButton.classList.add('deactivate');
+
+                            // Send the value '2' to the ESP32 (activate alarm)
+                            fetch('/send-to-serial', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ command: 2 })
+                            });
+
+                            updateAlarmState(1);
+                        } else if (action === 'deactivate') {
+                            deactivateButton.innerText = 'Activate Alarm';
+                            deactivateButton.classList.remove('deactivate');
+                            deactivateButton.classList.add('activate');
+
+                            // Send the value '3' to the ESP32 (deactivate alarm)
+                            fetch('/send-to-serial', {
+                                method: 'POST',
+                                headers: { 'Content-Type': 'application/json' },
+                                body: JSON.stringify({ command: 3 })
+                            });
+
+                            updateAlarmState(0);
+                        }
+                    } else {
+                        alert(data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("An error occurred while verifying the activation code.");
+                });
+        }
+
+        // Function to update the alarm state in the backend
+        function updateAlarmState(state) {
+            fetch('/update-alarm-state', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ state: state })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (!data.success) {
+                    alert("Failed to update alarm state: " + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert("An error occurred while updating the alarm state.");
+            });
+        }
+
+
+        // Fetch the current alarm state and update the button
+        function loadAlarmState() {
+            fetch('/api/alarm-state')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        const deactivateButton = document.getElementById('deactivate');
+                        const alarmState = data.state;
+
+                        if (alarmState === 1) {  // Alarm is activated
+                            deactivateButton.innerText = 'Deactivate Alarm';
+                            deactivateButton.classList.add('deactivate');
+                            deactivateButton.classList.remove('activate');
+                        } else if (alarmState === 0) {  // Alarm is deactivated
+                            deactivateButton.innerText = 'Activate Alarm';
+                            deactivateButton.classList.add('activate');
+                            deactivateButton.classList.remove('deactivate');
+                        }
+                    } else {
+                        console.error('Failed to load alarm state:', data.message);
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    alert("An error occurred while loading the alarm state.");
+                });
+        }
+
+
+        // Load the alarm state when the page loads
+        window.onload = function() {
+            loadAlarmState();
+        };
+    </script>
+</head>
+<body>
+    <button id="return" onclick="location.href='/login'">Return</button>
+    <div>
+        <h3>Alarm System</h3>
+        <button onclick="location.href='/logs'">View Activation Logs</button>
+        <br>
+        <button onclick="setActivationCode()">Set Activation Code</button>
+        <br>
+        <button onclick="changePassword()">Change Password</button>
+        <br>
+        <button onclick="deactivateAlarm()" id="deactivate" class="activate">Activate Alarm</button>
+    </div>
+</body>
+</html>
